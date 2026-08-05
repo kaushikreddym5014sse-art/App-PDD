@@ -275,7 +275,164 @@ add_tc(M,"Static assets cached with CDN headers","Deployment","Inspect response 
 add_tc(M,"HTTPS redirect configured for production","Deployment","Check server config","HTTP → HTTPS redirect active")
 add_tc(M,"CSP headers configured","Security","Inspect response headers","Content-Security-Policy header present")
 
+# ── 16. Certificate Card Component ────────────────────────────────────────────
+M = "Certificate Card"
+add_tc(M,"Certificate card renders with all fields","UI/UX","Inspect card component","All 6 fields displayed")
+add_tc(M,"Blockchain hash shown with monospace font","UI/UX","Inspect hash text","font-family monospace applied")
+add_tc(M,"Holder name truncates at 40 chars","UI/UX","Long name cert","Name truncated with ellipsis")
+add_tc(M,"VERIFIED badge is green","UI/UX","Inspect status badge","Green badge for verified status")
+add_tc(M,"PENDING badge is yellow","UI/UX","Inspect status badge","Yellow/amber badge for pending")
+add_tc(M,"FRAUD badge is red","UI/UX","Inspect status badge","Red badge for fraud status")
+add_tc(M,"SUSPICIOUS badge is orange","UI/UX","Inspect status badge","Orange badge for suspicious")
+add_tc(M,"Card hover shows shadow/glow","UI/UX","Hover on card","Shadow glow animation triggered")
+add_tc(M,"Issue date formatted as DD/MM/YYYY","UI/UX","Inspect date label","Human-readable date shown")
+add_tc(M,"Grade field visible on card","Functional","Inspect card","Grade value displayed")
+add_tc(M,"Registration number shown","Functional","Inspect card","Reg number present")
+add_tc(M,"Institution name full visible","Functional","Inspect card","Full institution name displayed")
+add_tc(M,"Card accessible via keyboard","Accessibility","Tab to card","Card focusable via Tab key")
+add_tc(M,"Card aria-label set","Accessibility","Inspect ARIA","aria-label present on card")
+add_tc(M,"Copy hash button on card","Functional","Inspect card actions","Copy icon/button present")
+add_tc(M,"Card prints correctly","UI/UX","Trigger print","Print view retains layout")
+
+# ── 17. QR Scanner Modal ───────────────────────────────────────────────────────
+M = "QR Scanner Modal"
+add_tc(M,"Modal opens on QR icon click","Functional","Click QR button on verify page","Modal appears with animation")
+add_tc(M,"Modal has close (X) button","UI/UX","Inspect modal header","Close icon visible")
+add_tc(M,"Pressing ESC closes modal","Functional","Press ESC key","Modal dismissed")
+add_tc(M,"Clicking outside modal closes it","Functional","Click backdrop","Modal closes")
+add_tc(M,"Camera permission prompt shown","Native","Open modal on first use","Browser camera permission dialog")
+add_tc(M,"Camera stream renders in modal","Functional","Grant camera permission","Live video feed visible")
+add_tc(M,"Valid QR code populates hash input","Functional","Scan valid BC QR code","Hash input populated")
+add_tc(M,"Invalid QR code shows error","Functional","Scan random QR","Error: Not a valid BlockCertify QR")
+add_tc(M,"Modal title 'Scan Certificate QR' present","UI/UX","Inspect modal title","Title text visible")
+add_tc(M,"Scan overlay box shown on camera","UI/UX","Inspect modal","Green scan box overlay visible")
+add_tc(M,"Modal is responsive on mobile 375px","Responsive","Open on 375px viewport","Modal fills width correctly")
+add_tc(M,"Modal backdrop blur applies","UI/UX","Inspect backdrop","backdrop-blur class applied")
+add_tc(M,"Manual entry fallback available","Functional","Inspect modal footer","Manual entry option/link present")
+
+# ── 18. AuthContext & Session Management ───────────────────────────────────────
+M = "Auth & Session"
+add_tc(M,"JWT persisted across page refresh","Functional","Login, refresh page","Still logged in after refresh")
+add_tc(M,"User data persisted in localStorage","Functional","Login, inspect storage","blockcertify_user key present")
+add_tc(M,"Expired session redirects to /login","Security","Expire token, navigate","Redirect to /login")
+add_tc(M,"Multiple tab sign-out synchronised","Security","Sign out in tab A, switch to tab B","Tab B also signed out")
+add_tc(M,"Sign-up flow creates account and logs in","Functional","Complete sign-up form","Redirected to dashboard")
+add_tc(M,"Duplicate email registration rejected","Validation","Register with existing email","Error: email already registered")
+add_tc(M,"Password hashed (not stored in plain)","Security","Inspect network/response","Password not returned in response")
+add_tc(M,"Role 'institution' grants issuer access","AuthZ","Login as institution","Issuer portal accessible")
+add_tc(M,"Role 'user' cannot access issuer portal","AuthZ","Login as user, visit /issuer","Access restricted or read-only")
+add_tc(M,"Auto-logout after 7 days (JWT expiry)","Security","Wait or fake exp claim","Session expires gracefully")
+add_tc(M,"Login redirect preserves original URL","UX","Visit /dashboard unauthenticated → login","After login redirected to /dashboard")
+
+# ── 19. Footer Component ───────────────────────────────────────────────────────
+M = "Footer"
+add_tc(M,"Footer renders on all pages","UI/UX","Navigate to 6 pages","Footer visible on each page")
+add_tc(M,"Copyright year is current (2026)","UI/UX","Inspect footer text","© 2026 present")
+add_tc(M,"'BlockCertify' brand in footer","UI/UX","Inspect footer","Brand name in footer")
+add_tc(M,"Footer social links present","UI/UX","Inspect footer links","GitHub link visible")
+add_tc(M,"Footer links open correctly","Functional","Click footer links","Links navigate correctly")
+add_tc(M,"Footer responsive on mobile","Responsive","Resize to 375px","Footer stacks vertically")
+add_tc(M,"Footer background matches dark theme","UI/UX","Inspect footer bg","Dark navy bg consistent")
+add_tc(M,"Footer text readable (contrast ok)","Accessibility","Inspect text contrast","Contrast ratio ≥ 4.5:1")
+
+# ── 20. Error Handling & Edge Cases ───────────────────────────────────────────
+M = "Error Handling"
+add_tc(M,"404 page shown for unknown routes","Functional","Navigate to /unknown","Custom 404 page rendered")
+add_tc(M,"Network error shows user-friendly toast","Functional","Kill API, trigger request","Toast: Cannot reach server")
+add_tc(M,"5xx API error handled gracefully","Functional","Force 500, trigger request","Error toast, no crash")
+add_tc(M,"Empty state on empty credentials list","UI/UX","Dashboard with 0 certs","Empty state illustration shown")
+add_tc(M,"Loading spinner on API pending","UI/UX","Slow network, trigger fetch","Spinner visible during load")
+add_tc(M,"Retry button on API failure","Functional","API fails, inspect UI","Retry button displayed")
+add_tc(M,"Form error messages are descriptive","UX","Submit invalid form","Specific field errors shown")
+add_tc(M,"Long API response times handled","Performance","Simulate 3s latency","Loading state maintained")
+add_tc(M,"Concurrent API calls don't conflict","Functional","Rapid form submissions","Requests handled independently")
+add_tc(M,"Large file upload rejected gracefully","Validation","Upload 10MB file","Error: file too large")
+add_tc(M,"Special characters in inputs handled","Validation","Enter emojis/unicode","Input accepts or rejects cleanly")
+add_tc(M,"Null/undefined values in API response handled","Robustness","Inspect with partial data","No JS undefined errors")
+
+# ── 21. Accessibility (WCAG 2.1) ──────────────────────────────────────────────
+M = "Accessibility"
+add_tc(M,"All images have alt attributes","Accessibility","Inspect all <img> tags","alt text present on all images")
+add_tc(M,"All form inputs have associated labels","Accessibility","Inspect form labels","<label> linked to each input")
+add_tc(M,"Heading hierarchy correct (H1 → H2 → H3)","Accessibility","Inspect heading order","No skipped heading levels")
+add_tc(M,"Single H1 per page","Accessibility","Count H1 tags on each page","Exactly 1 H1 per page")
+add_tc(M,"Skip to main content link present","Accessibility","Tab on page load","Skip link visible on focus")
+add_tc(M,"Focus order logical (top-to-bottom)","Accessibility","Tab through entire page","Focus moves top to bottom")
+add_tc(M,"Buttons have accessible names","Accessibility","Inspect all buttons","Button text or aria-label present")
+add_tc(M,"Links have descriptive text","Accessibility","Inspect all <a> tags","No 'click here' link text")
+add_tc(M,"Error messages announced to screen readers","Accessibility","Trigger validation error","aria-live region updated")
+add_tc(M,"Modal traps focus while open","Accessibility","Open modal, Tab","Focus stays inside modal")
+add_tc(M,"Colour is not the only indicator","Accessibility","Inspect status badges","Text label + colour used")
+add_tc(M,"Touch targets ≥ 44×44px on mobile","Accessibility","Inspect button sizes on 375px","All buttons ≥ 44px")
+
+# ── 22. State Management & Data Consistency ────────────────────────────────────
+M = "State Management"
+add_tc(M,"Cert issued on web appears on mobile (shared DB)","Integration","Issue cert on web, reload mobile","Same cert visible on mobile")
+add_tc(M,"Issuer whitelisted on web appears on mobile","Integration","Whitelist on web, check mobile list","Issuer appears on mobile screen")
+add_tc(M,"Profile edit persists after page reload","Functional","Edit name, reload /profile","Updated name still shown")
+add_tc(M,"Certificate count on dashboard updates post-issue","Functional","Issue cert, return to dashboard","Count increments by 1")
+add_tc(M,"Verification log recorded after verify","Integration","Verify cert, check DB","Log entry in verification_logs")
+add_tc(M,"Stale data refreshed on pull-to-refresh","Functional","Trigger refresh","New data fetched from API")
+add_tc(M,"Search filter state cleared on route change","UX","Search, navigate away, return","Search field cleared")
+add_tc(M,"Wallet address preserved across pages","Web3","Connect wallet, navigate","Address consistent on all pages")
+
+# ── 23. Notification & Feedback ───────────────────────────────────────────────
+M = "Notifications"
+add_tc(M,"Success toast appears on cert issue","Functional","Issue valid cert","Green toast: Certificate issued!")
+add_tc(M,"Error toast appears on API failure","Functional","Trigger API error","Red toast with error message")
+add_tc(M,"Toast auto-dismisses after 4 seconds","UI/UX","Observe toast","Toast disappears after ~4s")
+add_tc(M,"Multiple toasts stack correctly","UI/UX","Trigger 2 toasts","Both visible, stacked")
+add_tc(M,"Toast has close (X) button","UI/UX","Inspect toast","Dismiss X present on toast")
+add_tc(M,"Warning toast for unverified cert","Functional","Verify pending cert","Yellow warning toast shown")
+
+# ── 24. Pagination & Infinite Scroll ──────────────────────────────────────────
+M = "Pagination"
+add_tc(M,"Pagination controls show when >10 items","Functional","Dashboard with 11+ certs","Page 1 of N controls visible")
+add_tc(M,"Next page button loads next 10 certs","Functional","Click Next on page 1","New 10 certs loaded")
+add_tc(M,"Previous page button disabled on page 1","UI/UX","Inspect on page 1","Prev button disabled")
+add_tc(M,"Last page Next button disabled","UI/UX","Navigate to last page","Next button disabled")
+add_tc(M,"Page number indicator correct","UI/UX","Inspect pagination","'Page 2 of 4' displayed correctly")
+add_tc(M,"Search resets pagination to page 1","Functional","Search on page 3","Returns to page 1")
+
+# ── 25. CSV / Batch Issuer ────────────────────────────────────────────────────
+M = "Batch CSV Issuer"
+add_tc(M,"Sample CSV download button present","Functional","Inspect batch issuer","Download sample CSV button")
+add_tc(M,"Sample CSV has correct headers","Functional","Download and inspect CSV","holder_name,degree,institution,... columns")
+add_tc(M,"CSV with 10 rows parses all rows","Functional","Upload 10-row CSV","All 10 rows previewed")
+add_tc(M,"CSV with 50 rows processed without timeout","Performance","Upload 50-row CSV","All processed within 10s")
+add_tc(M,"Rows with missing required fields flagged","Validation","Upload CSV with empty cells","Missing field rows highlighted")
+add_tc(M,"Duplicate rows flagged in preview","Validation","Upload CSV with dup rows","Duplicate warning displayed")
+add_tc(M,"Batch submit issues all valid rows","Functional","Submit valid 10-row CSV","10 certs issued, success toast")
+add_tc(M,"Progress bar shown during batch upload","UI/UX","Upload and submit","Progress bar visible")
+add_tc(M,"Batch result summary shown post-issue","Functional","After batch submit","X issued, Y failed summary")
+add_tc(M,"Non-CSV file rejected","Validation","Upload .pdf file","Error: invalid file type")
+
+# ── 26. Polygon / Blockchain Layer ────────────────────────────────────────────
+M = "Blockchain Layer"
+add_tc(M,"Chain ID 80002 label visible in header","Web3","Inspect dashboard header","Chain ID 80002 badge shown")
+add_tc(M,"blockchain_hash present on issued cert","Integration","Issue cert, inspect response","Non-empty hash field")
+add_tc(M,"Hash format is 0x + 64 hex chars","Validation","Inspect issued cert hash","Regex: 0x[0-9a-f]{64}")
+add_tc(M,"txHash present on issued cert","Integration","Issue cert, inspect response","txHash field not null")
+add_tc(M,"Fraud score 0 for genuine cert","Integration","Fraud check on valid cert","fraud_score = 0 returned")
+add_tc(M,"Fraud score > 50 triggers SUSPICIOUS","Integration","Fraud check on flagged cert","Status = SUSPICIOUS shown")
+add_tc(M,"Polygon Amoy testnet label in wallet card","Web3","Inspect /profile wallet card","'Polygon Amoy' text visible")
+add_tc(M,"Switching to wrong chain shows alert","Web3","Connect to chain 1 (mainnet)","Alert: Please switch to Amoy 80002")
+
+# ── 27. Smoke Test — Route Availability ───────────────────────────────────────
+M = "Smoke Tests"
+add_tc(M,"GET / returns HTTP 200","Smoke","HTTP GET /","Status 200")
+add_tc(M,"GET /verify returns HTTP 200","Smoke","HTTP GET /verify","Status 200")
+add_tc(M,"GET /login returns HTTP 200","Smoke","HTTP GET /login","Status 200")
+add_tc(M,"GET /issuer returns HTTP 200","Smoke","HTTP GET /issuer","Status 200")
+add_tc(M,"GET /dashboard returns HTTP 200","Smoke","HTTP GET /dashboard","Status 200")
+add_tc(M,"GET /profile returns HTTP 200","Smoke","HTTP GET /profile","Status 200")
+add_tc(M,"GET /api/health returns HTTP 200","Smoke","HTTP GET /api/health","Status 200")
+add_tc(M,"POST /api/auth/login accepts JSON","Smoke","POST with JSON body","Status 200 or 401")
+add_tc(M,"GET /api/certificates returns JSON array","Smoke","GET with valid JWT","Status 200, array body")
+add_tc(M,"404 on undefined /api/unknown","Smoke","HTTP GET /api/unknown","Status 404")
+
 print(f"✅ Test catalog built: {len(TEST_CASES)} test cases")
+
 
 # ─── Execute lightweight smoke test via HTTP ──────────────────────────────────
 import urllib.request, urllib.error
