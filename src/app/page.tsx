@@ -57,7 +57,7 @@ export default function Home() {
 
         {/* Hero Subtitle */}
         <p className="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed">
-          Issue, manage, and instantly verify academic & professional credentials using Polygon smart contracts. Unified across Web & Expo Mobile app.
+          Issue, manage, and instantly verify academic & professional credentials using Polygon smart contracts. Unified Web Verification Platform.
         </p>
 
         {/* Quick Search Lookup Box */}
