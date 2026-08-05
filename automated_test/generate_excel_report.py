@@ -637,6 +637,31 @@ for ri, (m, v, req, vd) in enumerate([
     verdict_cell(ws_l, ri, 4, vd)
 autofit(ws_l, [32, 20, 20, 14])
 
+# ── 300 Load Test Cases Sheet ───────────────────────────────────────────────
+try:
+    with open("automated_test/300_load_test_cases.json") as f:
+        load_tcs = json.load(f)
+    ws_ltc = wb.create_sheet("300 Load Test Cases")
+    ws_ltc.sheet_view.showGridLines = True
+    ltc_cols = ["TC ID", "Endpoint", "Method", "Scenario / Load Target", "Users", "Total Reqs", "Target RPS", "Actual RPS", "Avg Latency (ms)", "Min Latency (ms)", "Max Latency (ms)", "P95 (ms)", "P99 (ms)", "Success Rate", "Status"]
+    apply_header(ws_ltc, 1, ltc_cols, bg=PAL["dark"], fg=PAL["cyan"])
+    for ri, tc in enumerate(load_tcs, 2):
+        vals = [
+            tc["tc_id"], tc["endpoint"], tc["method"], tc["scenario"],
+            tc["concurrent_users"], tc["total_requests"], tc["target_rps"], tc["actual_rps"],
+            tc["avg_latency_ms"], tc["min_latency_ms"], tc["max_latency_ms"],
+            tc["p95_latency_ms"], tc["p99_latency_ms"], f"{tc['success_rate_pct']}%", tc["status"]
+        ]
+        for ci, v in enumerate(vals, 1):
+            if ci == 15:
+                verdict_cell(ws_ltc, ri, ci, v)
+            else:
+                write_cell(ws_ltc, ri, ci, v, align="center" if ci in (1,3,5,6,7,8,9,10,11,12,13,14) else "left")
+    autofit(ws_ltc, [14, 32, 10, 42, 10, 14, 14, 14, 16, 16, 16, 14, 14, 14, 12])
+    ws_ltc.freeze_panes = "A2"
+except Exception as e:
+    print(f"Warning: Could not load 300_load_test_cases.json: {e}")
+
 # ── All TCs master sheet ──────────────────────────────────────────────────────
 write_tc_sheet(wb, "📋 All Test Cases", TCS)
 
