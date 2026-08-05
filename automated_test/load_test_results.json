@@ -1,0 +1,9 @@
+{
+  "virtual_users": 100,
+  "duration_sec": 60,
+  "total_requests": 127768,
+  "requests_per_sec": 2127.62,
+  "avg_response_time_ms": 35.29,
+  "min_response_time_ms": 0.71,
+  "max_response_time_ms": 7833.94
+}
