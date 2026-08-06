@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Award, Plus, Upload, ShieldCheck, Check, AlertCircle, Loader2, FileSpreadsheet, Send } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Certificate, IssueCertificatePayload } from "@/types/certificate";
@@ -12,6 +12,21 @@ function IssuerDashboardContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successCert, setSuccessCert] = useState<Certificate | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const data = await apiClient.listCertificates();
+      if (data && data.length > 0) {
+        setIssuedHistory(data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch issuance history:", err);
+    }
+  };
 
   const [formData, setFormData] = useState<IssueCertificatePayload>({
     holder_name: "",

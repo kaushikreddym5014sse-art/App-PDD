@@ -1,8 +1,8 @@
 import { Certificate, IssueCertificatePayload, VerificationResult } from "@/types/certificate";
 import { AuthResponse, User } from "@/types/auth";
 
-const PRIMARY_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-const FALLBACK_URL = "http://localhost:4000/api";
+const PRIMARY_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const FALLBACK_URL = "http://localhost:5000/api";
 
 class ApiClient {
   private getHeaders(authRequired = true): HeadersInit {
