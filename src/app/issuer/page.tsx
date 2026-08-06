@@ -21,7 +21,14 @@ function IssuerDashboardContent() {
     try {
       const data = await apiClient.listCertificates();
       if (data && data.length > 0) {
-        setIssuedHistory(data);
+        setIssuedHistory((prev) => {
+          const map = new Map<string, Certificate>();
+          [...data, ...prev].forEach((item) => {
+            const key = item.id || item.blockchain_hash;
+            if (key && !map.has(key)) map.set(key, item);
+          });
+          return Array.from(map.values());
+        });
       }
     } catch (err) {
       console.warn("Failed to fetch issuance history:", err);
@@ -84,7 +91,14 @@ function IssuerDashboardContent() {
       const result = await apiClient.issueCertificate(formData);
       if (result.certificate) {
         setSuccessCert(result.certificate);
-        setIssuedHistory((prev) => [result.certificate, ...prev]);
+        setIssuedHistory((prev) => {
+          const map = new Map<string, Certificate>();
+          [result.certificate, ...prev].forEach((item) => {
+            const key = item.id || item.blockchain_hash;
+            if (key && !map.has(key)) map.set(key, item);
+          });
+          return Array.from(map.values());
+        });
         setFormData({
           holder_name: "",
           degree: "",

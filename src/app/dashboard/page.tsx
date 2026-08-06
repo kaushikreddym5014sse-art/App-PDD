@@ -51,10 +51,18 @@ function DashboardContent() {
       if (profile) setCurrentUser(profile);
 
       const data = await apiClient.listCertificates();
-      setCertificates(data);
-      if (data.length > 0) {
-        setSelectedCert(data[0]);
-      }
+      setCertificates((prev) => {
+        const map = new Map<string, Certificate>();
+        [...data, ...prev].forEach((item) => {
+          const key = item.id || item.blockchain_hash;
+          if (key && !map.has(key)) map.set(key, item);
+        });
+        const merged = Array.from(map.values());
+        if (merged.length > 0 && !selectedCert) {
+          setSelectedCert(merged[0]);
+        }
+        return merged;
+      });
     } catch (err) {
       console.error("Failed to load dashboard:", err);
     } finally {
