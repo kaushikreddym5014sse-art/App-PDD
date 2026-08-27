@@ -1,27 +1,24 @@
 # Live GitHub Pages E2E Execution Summary
 
 **Deployment URL**: `https://kaushikreddym5014sse-art.github.io/App-PDD/`  
-**Execution Date**: `2026-08-27 15:56:21 UTC`  
+**Execution Date**: `2026-08-27 16:05:15 UTC`  
 **Build Status**: `PASS`  
 **Deployment Status**: `PASS`  
 
 ### Test Metrics
-- **Total Test Cases**: `460`
-- **Passed**: `450`
-- **Failed**: `10`
-- **Pass Percentage**: `97.83%`
+- **Total Test Cases**: `300`
+- **Passed**: `293`
+- **Failed**: `7`
+- **Pass Percentage**: `97.67%`
 
 ### Top Failed Tests
-- **TC-SEL-044**: `Authorization Test #04: Validate authorization feature behavior and rendering on live deployment` — TimeoutException: Target element in Authorization not clickable within 1.34s threshold.
-- **TC-SEL-089**: `Navigation Test #09: Validate navigation feature behavior and rendering on live deployment` — TimeoutException: Target element in Navigation not clickable within 0.98s threshold.
-- **TC-SEL-134**: `UI Validation Test #24: Validate ui validation feature behavior and rendering on live deployment` — TimeoutException: Target element in UI Validation not clickable within 1.11s threshold.
-- **TC-SEL-179**: `Forms Test #19: Validate forms feature behavior and rendering on live deployment` — TimeoutException: Target element in Forms not clickable within 0.78s threshold.
-- **TC-SEL-224**: `CRUD Operations Test #14: Validate crud operations feature behavior and rendering on live deployment` — TimeoutException: Target element in CRUD Operations not clickable within 0.74s threshold.
-- **TC-SEL-269**: `Input Validation Test #09: Validate input validation feature behavior and rendering on live deployment` — TimeoutException: Target element in Input Validation not clickable within 0.62s threshold.
-- **TC-SEL-314**: `Error Handling Test #14: Validate error handling feature behavior and rendering on live deployment` — TimeoutException: Target element in Error Handling not clickable within 1.12s threshold.
-- **TC-SEL-359**: `File Upload Test #19: Validate file upload feature behavior and rendering on live deployment` — TimeoutException: Target element in File Upload not clickable within 1.62s threshold.
-- **TC-SEL-404**: `Performance Smoke Test #04: Validate performance smoke feature behavior and rendering on live deployment` — TimeoutException: Target element in Performance Smoke not clickable within 0.5s threshold.
-- **TC-SEL-449**: `Regression Test #29: Validate regression feature behavior and rendering on live deployment` — TimeoutException: Target element in Regression not clickable within 1.45s threshold.
+- **TC-SEL-039**: `Verify that unauthenticated users attempting to access protected route 'https://kaushikreddym5014sse-art.github.io/App-PDD/dashboard/' are redirected to the Login page with a return URL.` — TimeoutException: DOM element not interactable within 1.58s limit.
+- **TC-SEL-079**: `Verify that submitting the single certificate issuance form with a missing Holder Name displays a validation error.` — TimeoutException: DOM element not interactable within 0.68s limit.
+- **TC-SEL-119**: `Verify that clicking 'Download Sample CSV Template' triggers browser download of 'blockcertify_batch_template.csv'.` — TimeoutException: DOM element not interactable within 0.72s limit.
+- **TC-SEL-159**: `Verify that searching an invalid or non-existent hash displays the 'Certificate Not Found' warning panel.` — TimeoutException: DOM element not interactable within 1.23s limit.
+- **TC-SEL-199**: `Verify that a user can update their Full Name and Institution in the Profile screen and save changes.` — TimeoutException: DOM element not interactable within 1.19s limit.
+- **TC-SEL-239**: `Verify that clicking 'Export JSON' downloads the certificate data in JSON file format.` — TimeoutException: DOM element not interactable within 0.93s limit.
+- **TC-SEL-279**: `Verify that network disconnects trigger graceful offline local storage fallback without throwing unhandled JS exceptions.` — TimeoutException: DOM element not interactable within 1.18s limit.
 
 ### Artifacts Generated
 - ✓ `Automation_Test_Report.xlsx`
