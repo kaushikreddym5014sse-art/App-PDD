@@ -9,7 +9,6 @@ import {
   RefreshCw, 
   Grid, 
   List as ListIcon, 
-  CheckCircle2, 
   User, 
   LogOut, 
   Sparkles, 
@@ -44,6 +43,19 @@ function DashboardContent() {
 
   useEffect(() => {
     fetchProfileAndDashboard();
+
+    const handleIssuedEvent = () => {
+      fetchProfileAndDashboard();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("certificate_issued", handleIssuedEvent);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("certificate_issued", handleIssuedEvent);
+      }
+    };
   }, []);
 
   const fetchProfileAndDashboard = async () => {
@@ -105,7 +117,7 @@ function DashboardContent() {
         <div className="flex items-center gap-3">
           <button 
             onClick={fetchProfileAndDashboard} 
-            className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-[#00FF87] border border-white/10 transition-colors"
+            className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-[#00FF87] border border-white/10 transition-colors cursor-pointer"
             title="Refresh Dashboard"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin text-[#00FF87]" : ""}`} />
@@ -116,7 +128,7 @@ function DashboardContent() {
               apiClient.logout();
               router.push("/login");
             }}
-            className="p-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors"
+            className="p-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-colors cursor-pointer"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
@@ -180,13 +192,13 @@ function DashboardContent() {
           <div className="flex p-1 bg-black/40 rounded-xl border border-white/10 text-xs">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${statusFilter === "all" ? "bg-[#00FF87] text-[#070B14] font-bold" : "text-slate-400 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${statusFilter === "all" ? "bg-[#00FF87] text-[#070B14] font-bold" : "text-slate-400 hover:text-white"}`}
             >
               All ({certificates.length})
             </button>
             <button
               onClick={() => setStatusFilter("verified")}
-              className={`px-3 py-1.5 rounded-lg transition-all ${statusFilter === "verified" ? "bg-[#00FF87] text-[#070B14] font-bold" : "text-slate-400 hover:text-white"}`}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${statusFilter === "verified" ? "bg-[#00FF87] text-[#070B14] font-bold" : "text-slate-400 hover:text-white"}`}
             >
               Verified
             </button>
@@ -195,14 +207,14 @@ function DashboardContent() {
           <div className="flex p-1 bg-black/40 rounded-xl border border-white/10 text-xs">
             <button
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-lg transition-all ${viewMode === "grid" ? "bg-[#00FF87] text-[#070B14]" : "text-slate-400 hover:text-white"}`}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === "grid" ? "bg-[#00FF87] text-[#070B14]" : "text-slate-400 hover:text-white"}`}
               title="Grid View"
             >
               <Grid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg transition-all ${viewMode === "list" ? "bg-[#00FF87] text-[#070B14]" : "text-slate-400 hover:text-white"}`}
+              className={`p-1.5 rounded-lg transition-all cursor-pointer ${viewMode === "list" ? "bg-[#00FF87] text-[#070B14]" : "text-slate-400 hover:text-white"}`}
               title="List View"
             >
               <ListIcon className="w-4 h-4" />
@@ -220,11 +232,11 @@ function DashboardContent() {
       ) : filteredCerts.length === 0 ? (
         <div className="py-16 text-center border border-dashed border-white/10 rounded-3xl text-slate-400">
           <FileText className="w-10 h-10 text-slate-500 mx-auto mb-2" />
-          <h3 className="text-base font-bold text-white mb-1">No credentials found</h3>
+          <h3 className="text-base font-bold text-white mb-1">No certificates issued yet</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto mb-4">No certificates match your search query or no certificates have been issued yet.</p>
           <button
             onClick={() => router.push("/issuer")}
-            className="px-5 py-2.5 rounded-xl bg-[#00FF87] text-[#070B14] font-bold text-xs hover:bg-[#00E67A] transition-all"
+            className="px-5 py-2.5 rounded-xl bg-[#00FF87] text-[#070B14] font-bold text-xs hover:bg-[#00E67A] transition-all cursor-pointer"
           >
             Go to Issuer Portal →
           </button>

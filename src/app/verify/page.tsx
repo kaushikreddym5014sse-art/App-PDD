@@ -7,6 +7,7 @@ import { apiClient } from "@/lib/api-client";
 import { Certificate, VerificationResult } from "@/types/certificate";
 import CertificateCard from "@/components/verify/CertificateCard";
 import QRScannerModal from "@/components/verify/QRScannerModal";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 function VerifyContent() {
   const searchParams = useSearchParams();
@@ -37,7 +38,6 @@ function VerifyContent() {
       setResult(res);
 
       if (res.certificate && res.certificate.id) {
-        // Optionally fetch fraud check assessment from backend
         try {
           const fraudData = await apiClient.checkFraud(res.certificate.id);
           setFraudInfo(fraudData);
@@ -175,13 +175,15 @@ function VerifyContent() {
 
 export default function VerifyPage() {
   return (
-    <Suspense fallback={
-      <div className="w-full py-20 text-center text-slate-400 flex items-center justify-center gap-2">
-        <Loader2 className="w-6 h-6 animate-spin text-[#00FF87]" />
-        <span>Loading Verification Portal...</span>
-      </div>
-    }>
-      <VerifyContent />
-    </Suspense>
+    <AuthGuard>
+      <Suspense fallback={
+        <div className="w-full py-20 text-center text-slate-400 flex items-center justify-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-[#00FF87]" />
+          <span>Loading Verification Portal...</span>
+        </div>
+      }>
+        <VerifyContent />
+      </Suspense>
+    </AuthGuard>
   );
 }

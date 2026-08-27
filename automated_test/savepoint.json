@@ -1,0 +1,77 @@
+{
+  "status": "completed",
+  "baseUrl": "http://localhost:4000",
+  "endpoints": [
+    {
+      "path": "/api/auth/register",
+      "method": "POST",
+      "public": true,
+      "expected_roles": [
+        "public"
+      ]
+    },
+    {
+      "path": "/api/auth/login",
+      "method": "POST",
+      "public": true,
+      "expected_roles": [
+        "public"
+      ]
+    },
+    {
+      "path": "/api/auth/profile",
+      "method": "GET",
+      "public": false,
+      "expected_roles": [
+        "user",
+        "institution",
+        "employer",
+        "admin"
+      ]
+    },
+    {
+      "path": "/api/certificates/verify/hash",
+      "method": "POST",
+      "public": false,
+      "expected_roles": [
+        "user",
+        "institution",
+        "employer",
+        "admin"
+      ]
+    },
+    {
+      "path": "/api/certificates",
+      "method": "GET",
+      "public": false,
+      "expected_roles": [
+        "user",
+        "institution",
+        "employer",
+        "admin"
+      ]
+    },
+    {
+      "path": "/api/certificates/issue",
+      "method": "POST",
+      "public": false,
+      "expected_roles": [
+        "institution",
+        "admin"
+      ]
+    },
+    {
+      "path": "/api/certificates/fraud-check",
+      "method": "POST",
+      "public": false,
+      "expected_roles": [
+        "user",
+        "institution",
+        "employer",
+        "admin"
+      ]
+    }
+  ],
+  "tests_written": 127,
+  "completed_at": "2026-08-05T14:33:57Z"
+}

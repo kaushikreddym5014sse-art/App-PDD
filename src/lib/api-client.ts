@@ -236,9 +236,10 @@ class ApiClient {
     }
   }
 
-  async getDashboardData(): Promise<DashboardData> {
+  async getDashboardData(userId?: string): Promise<DashboardData> {
     try {
-      const res = await this.fetchWithFallback("/certificates/dashboard", {
+      const query = userId ? `?userId=${encodeURIComponent(userId)}` : "";
+      const res = await this.fetchWithFallback(`/certificates/dashboard${query}`, {
         method: "GET",
         headers: this.getHeaders(true),
       });
@@ -283,20 +284,8 @@ class ApiClient {
       }
       return data;
     } catch (err: any) {
-      console.warn("Backend offline during certificate issuance, using local fallback:", err.message);
-      const newCert: Certificate = {
-        id: `BC-${Date.now().toString().slice(-6)}`,
-        holder_name: payload.holder_name,
-        degree: payload.degree,
-        institution: payload.institution,
-        issue_date: payload.issue_date,
-        grade: payload.grade || "Passed",
-        reg_number: payload.reg_number || `REG-${Date.now().toString().slice(-5)}`,
-        blockchain_hash: `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`,
-        status: "verified",
-        txHash: `0x${Math.random().toString(16).slice(2)}${Math.random().toString(16).slice(2)}`,
-      };
-      return { message: "Certificate issued (Demo Mode)", certificate: newCert };
+      console.warn("Backend error during certificate issuance:", err.message);
+      throw err;
     }
   }
 

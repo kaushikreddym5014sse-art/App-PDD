@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { 
   ShieldCheck, 
   Mail, 
@@ -22,6 +22,9 @@ import WalletConnectBtn from "@/components/wallet/WalletConnectBtn";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get("redirect") || "/";
+
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +39,14 @@ export default function LoginPage() {
   const [regFullName, setRegFullName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
-  const [regRole, setRegRole] = useState<"user" | "institution" | "employer">("user");
+  const [regRole, setRegRole] = useState<"user" | "institution" | "employer">("institution");
   const [regInstitution, setRegInstitution] = useState("");
+
+  const notifyAuthChanged = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("auth_state_changed"));
+    }
+  };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +61,11 @@ export default function LoginPage() {
 
     try {
       await apiClient.login(loginEmail, loginPassword);
-      setSuccessMsg("Login successful! Redirecting to dashboard...");
+      notifyAuthChanged();
+      setSuccessMsg("Authentication successful! Unlocking all pages...");
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 800);
+        router.push(redirectTarget);
+      }, 700);
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to sign in. Check your credentials.");
     } finally {
@@ -82,10 +92,11 @@ export default function LoginPage() {
         role: regRole,
         institution: regInstitution,
       });
-      setSuccessMsg("Account created successfully! Redirecting...");
+      notifyAuthChanged();
+      setSuccessMsg("Account created! Unlocking all pages...");
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 800);
+        router.push(redirectTarget);
+      }, 700);
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to register account.");
     } finally {
@@ -113,7 +124,7 @@ export default function LoginPage() {
             Welcome to <span className="gradient-text-neon">BlockCertify</span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
-            Decentralized Certificate Protocol Authentication
+            Sign in or register first to unlock all platform pages & features
           </p>
         </div>
 
@@ -215,7 +226,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.35)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.35)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -224,7 +235,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Sign In & Unlock Platform</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -352,7 +363,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.35)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.35)] flex items-center justify-center gap-2 mt-2 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -361,7 +372,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <span>Create BlockCertify Account</span>
+                  <span>Create Account & Unlock Platform</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Award, Plus, Upload, ShieldCheck, Check, AlertCircle, Loader2, FileSpreadsheet, Send, FileText } from "lucide-react";
+import { Award, Plus, ShieldCheck, Check, AlertCircle, Loader2, FileSpreadsheet, Send, FileText } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Certificate, IssueCertificatePayload } from "@/types/certificate";
 import { formatDate, shortenHash } from "@/lib/utils";
@@ -65,6 +65,7 @@ function IssuerDashboardContent() {
       const result = await apiClient.issueCertificate(formData);
       if (result && result.certificate) {
         setSuccessCert(result.certificate);
+        
         // Optimistically update Issuance History state immediately
         setIssuedHistory((prev) => {
           const map = new Map<string, Certificate>();
@@ -74,6 +75,11 @@ function IssuerDashboardContent() {
           });
           return Array.from(map.values());
         });
+
+        // Broadcast update event so Dashboard updates in real time if open
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("certificate_issued"));
+        }
 
         // Reset form
         setFormData({
@@ -132,7 +138,10 @@ function IssuerDashboardContent() {
             <span>Batch Upload</span>
           </button>
           <button
-            onClick={() => setActiveTab("history")}
+            onClick={() => {
+              setActiveTab("history");
+              fetchHistory();
+            }}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeTab === "history"
                 ? "bg-[#00FF87] text-[#070B14]"
@@ -305,8 +314,11 @@ function IssuerDashboardContent() {
                 </div>
 
                 <button
-                  onClick={() => setActiveTab("history")}
-                  className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/10 transition-all"
+                  onClick={() => {
+                    setActiveTab("history");
+                    fetchHistory();
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs border border-white/10 transition-all cursor-pointer"
                 >
                   View in Issuance History →
                 </button>

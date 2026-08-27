@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { ShieldCheck, Search, QrCode, ArrowRight, Zap, Lock, Globe2, Sparkles } from "lucide-react";
 import CertificateCard from "@/components/verify/CertificateCard";
 import QRScannerModal from "@/components/verify/QRScannerModal";
+import AuthGuard from "@/components/auth/AuthGuard";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
@@ -81,7 +82,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setIsQRModalOpen(true)}
-                className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-[#00FF87] border border-white/10 transition-colors"
+                className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-[#00FF87] border border-white/10 transition-colors cursor-pointer"
                 title="Scan QR Code"
               >
                 <QrCode className="w-5 h-5" />
@@ -89,7 +90,7 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.3)] flex items-center justify-center gap-2 shrink-0"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.3)] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
               >
                 <span>Verify Now</span>
                 <ArrowRight className="w-4 h-4" />
@@ -98,7 +99,7 @@ export default function Home() {
           </form>
 
           <p className="mt-3 text-xs text-slate-400 font-mono">
-            Try sample hash: <button onClick={() => setSearchQuery("0x7f8a9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a")} className="text-[#00FF87] underline hover:text-white">0x7f8a9b2c...</button>
+            Try sample hash: <button onClick={() => setSearchQuery("0x7f8a9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a")} className="text-[#00FF87] underline hover:text-white cursor-pointer">0x7f8a9b2c...</button>
           </p>
         </div>
 
@@ -130,7 +131,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Shared Express & Postgres Backend</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Connects directly to the existing Node.js REST API (`http://localhost:5000`) and PostgreSQL database `blockcertify`.
+              Connects directly to the existing Node.js REST API (`http://localhost:4000`) and PostgreSQL database `blockcertify`.
             </p>
           </div>
         </div>
@@ -172,7 +173,7 @@ export default function Home() {
               Ready to issue credentials on BlockCertify?
             </h3>
             <p className="text-xs sm:text-sm text-slate-400">
-              Access the Issuer Portal to issue certificates using your institution account or connect via Google OAuth.
+              Access the Issuer Portal to issue certificates using your institution account.
             </p>
           </div>
 
@@ -200,5 +201,13 @@ export default function Home() {
         onScanSuccess={handleQRSuccess}
       />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthGuard>
+      <HomeContent />
+    </AuthGuard>
   );
 }

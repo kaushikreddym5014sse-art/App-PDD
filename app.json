@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "BlockCertify",
+    "slug": "blockcertify",
+    "version": "1.0.0",
+    "sdkVersion": "54.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "blockcertify",
+    "entryPoint": "./index.js",
+    "android": {
+      "package": "com.dhanushravi.newproject"
+    },
+    "ios": {
+      "bundleIdentifier": "com.dhanushravi.newproject"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
