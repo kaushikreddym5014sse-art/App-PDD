@@ -117,3 +117,21 @@ body {
 .animate-pulse-glow {
   animation: pulseGlow 3s ease-in-out infinite;
 }
+
+/* Print Styles for PDF generation */
+@media print {
+  header, footer, nav, button:not(.print-keep) {
+    display: none !important;
+  }
+  body {
+    background-color: #070B14 !important;
+    color: #FFFFFF !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .glass-panel-neon {
+    border: 2px solid #00FF87 !important;
+    box-shadow: none !important;
+  }
+}
+

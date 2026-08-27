@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Award, Plus, ShieldCheck, Check, AlertCircle, Loader2, FileSpreadsheet, Send, FileText } from "lucide-react";
+import { Award, Plus, ShieldCheck, Check, AlertCircle, Loader2, FileSpreadsheet, Send, FileText, Download } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { Certificate, IssueCertificatePayload } from "@/types/certificate";
 import { formatDate, shortenHash } from "@/lib/utils";
@@ -12,6 +12,12 @@ function IssuerDashboardContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successCert, setSuccessCert] = useState<Certificate | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Bulk CSV state
+  const [bulkRecords, setBulkRecords] = useState<IssueCertificatePayload[]>([]);
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+  const [bulkSuccessMsg, setBulkSuccessMsg] = useState<string | null>(null);
+  const [bulkErrorMsg, setBulkErrorMsg] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<IssueCertificatePayload>({
     holder_name: "",
@@ -48,9 +54,101 @@ function IssuerDashboardContent() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleDownloadSampleCsv = () => {
+    const csvContent =
+      "Holder Name,Degree,Institution,Issue Date,Grade,Registration Number\n" +
+      "Sophia Martinez,B.Sc. Cyber Security,BlockCertify Academy,2026-05-10,First Class with Distinction,BC-REG-991201\n" +
+      "Marcus Vance,M.S. Distributed Systems,Polygon Guild Labs,2026-06-14,High Distinction,BC-REG-991202\n" +
+      "Aria Thorne,Certified Cryptographer,CyberSec Institute,2026-07-01,First Class,BC-REG-991203\n";
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "blockcertify_batch_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleCsvFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setBulkSuccessMsg(null);
+    setBulkErrorMsg(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+        if (lines.length <= 1) {
+          setBulkErrorMsg("CSV file is empty or missing data rows.");
+          return;
+        }
+
+        const parsed: IssueCertificatePayload[] = [];
+        // Skip header row
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
+          if (cols.length >= 3 && cols[0] && cols[1] && cols[2]) {
+            parsed.push({
+              holder_name: cols[0],
+              degree: cols[1],
+              institution: cols[2],
+              issue_date: cols[3] || new Date().toISOString().split("T")[0],
+              grade: cols[4] || "First Class",
+              reg_number: cols[5] || `BC-REG-${Math.floor(100000 + Math.random() * 900000)}`,
+            });
+          }
+        }
+
+        if (parsed.length === 0) {
+          setBulkErrorMsg("Could not parse valid certificate records from CSV. Check column order.");
+        } else {
+          setBulkRecords(parsed);
+        }
+      } catch (err: any) {
+        setBulkErrorMsg("Error reading CSV file: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleProcessBulkIssuance = async () => {
+    if (bulkRecords.length === 0 || isProcessingBulk) return;
+
+    setIsProcessingBulk(true);
+    setBulkErrorMsg(null);
+    setBulkSuccessMsg(null);
+
+    try {
+      const issued: Certificate[] = [];
+      for (const item of bulkRecords) {
+        const res = await apiClient.issueCertificate(item);
+        if (res && res.certificate) {
+          issued.push(res.certificate);
+        }
+      }
+
+      setBulkSuccessMsg(`Successfully issued ${issued.length} certificates in batch to the registry!`);
+      setBulkRecords([]);
+      fetchHistory();
+
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("certificate_issued"));
+      }
+    } catch (err: any) {
+      setBulkErrorMsg("Failed during batch issuance: " + err.message);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
   const handleIssueSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return; // Prevent double submit
+    if (isSubmitting) return;
 
     if (!formData.holder_name || !formData.degree || !formData.institution || !formData.issue_date) {
       setErrorMsg("Holder Name, Degree, Institution, and Issue Date are required.");
@@ -66,7 +164,6 @@ function IssuerDashboardContent() {
       if (result && result.certificate) {
         setSuccessCert(result.certificate);
         
-        // Optimistically update Issuance History state immediately
         setIssuedHistory((prev) => {
           const map = new Map<string, Certificate>();
           [result.certificate, ...prev].forEach((item) => {
@@ -76,12 +173,10 @@ function IssuerDashboardContent() {
           return Array.from(map.values());
         });
 
-        // Broadcast update event so Dashboard updates in real time if open
         if (typeof window !== "undefined") {
           window.dispatchEvent(new Event("certificate_issued"));
         }
 
-        // Reset form
         setFormData({
           holder_name: "",
           degree: "",
@@ -342,18 +437,109 @@ function IssuerDashboardContent() {
       )}
 
       {activeTab === "bulk" && (
-        <div className="glass-panel p-8 rounded-3xl border border-white/10 bg-[#0B1220] max-w-2xl mx-auto text-center">
-          <FileSpreadsheet className="w-12 h-12 text-[#00FF87] mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">Batch CSV Certificate Issuance</h3>
-          <p className="text-xs text-slate-400 mb-6">
-            Upload a CSV file containing multiple student records to issue certificates in bulk.
-          </p>
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#0B1220] max-w-3xl mx-auto space-y-6">
+          <div className="text-center max-w-xl mx-auto">
+            <FileSpreadsheet className="w-12 h-12 text-[#00FF87] mx-auto mb-3" />
+            <h3 className="text-xl font-bold text-white mb-1">Batch CSV Certificate Issuance</h3>
+            <p className="text-xs text-slate-400">
+              Upload a CSV spreadsheet containing multiple student records to issue certificates in batch.
+            </p>
 
-          <input
-            type="file"
-            accept=".csv"
-            className="block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#00FF87] file:text-[#070B14] hover:file:bg-[#00E67A] cursor-pointer mb-4"
-          />
+            <button
+              onClick={handleDownloadSampleCsv}
+              className="mt-4 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#00FF87] border border-[#00FF87]/30 text-xs font-mono font-semibold transition-all inline-flex items-center gap-2 cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Sample CSV Template</span>
+            </button>
+          </div>
+
+          {bulkErrorMsg && (
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2.5 text-rose-400 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{bulkErrorMsg}</span>
+            </div>
+          )}
+
+          {bulkSuccessMsg && (
+            <div className="p-3.5 rounded-xl bg-[#00FF87]/10 border border-[#00FF87]/30 flex items-center gap-2.5 text-[#00FF87] text-xs font-semibold">
+              <Check className="w-4 h-4 shrink-0" />
+              <span>{bulkSuccessMsg}</span>
+            </div>
+          )}
+
+          {/* File Upload Zone */}
+          <div className="p-6 rounded-2xl border-2 border-dashed border-white/10 bg-[#070B14] text-center hover:border-[#00FF87]/40 transition-colors">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCsvFileChange}
+              className="block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00FF87] file:text-[#070B14] hover:file:bg-[#00E67A] cursor-pointer"
+            />
+            <p className="text-[11px] text-slate-500 mt-2 font-mono">
+              Expected CSV columns: Holder Name, Degree, Institution, Issue Date, Grade, Reg Number
+            </p>
+          </div>
+
+          {/* Parsed CSV Preview Table */}
+          {bulkRecords.length > 0 && (
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-[#00FF87] font-bold">
+                  Parsed Records Preview ({bulkRecords.length})
+                </span>
+                <button
+                  onClick={() => setBulkRecords([])}
+                  className="text-xs text-slate-400 hover:text-white underline cursor-pointer"
+                >
+                  Clear List
+                </button>
+              </div>
+
+              <div className="max-h-60 overflow-y-auto border border-white/10 rounded-xl">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-white/5 text-slate-400 font-mono">
+                    <tr>
+                      <th className="p-2.5">#</th>
+                      <th className="p-2.5">Holder Name</th>
+                      <th className="p-2.5">Degree</th>
+                      <th className="p-2.5">Institution</th>
+                      <th className="p-2.5">Reg Number</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {bulkRecords.map((rec, idx) => (
+                      <tr key={idx} className="hover:bg-white/5">
+                        <td className="p-2.5 font-mono text-slate-500">{idx + 1}</td>
+                        <td className="p-2.5 font-bold text-white">{rec.holder_name}</td>
+                        <td className="p-2.5 text-slate-300">{rec.degree}</td>
+                        <td className="p-2.5 text-slate-400">{rec.institution}</td>
+                        <td className="p-2.5 font-mono text-[#00E5FF]">{rec.reg_number}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <button
+                onClick={handleProcessBulkIssuance}
+                disabled={isProcessingBulk}
+                className="w-full py-3.5 rounded-xl bg-[#00FF87] hover:bg-[#00E67A] text-[#070B14] font-bold text-sm transition-all shadow-[0_0_20px_rgba(0,255,135,0.35)] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              >
+                {isProcessingBulk ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Processing Batch & Generating Hashes...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Process & Issue All {bulkRecords.length} Certificates</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

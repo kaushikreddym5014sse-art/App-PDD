@@ -168,13 +168,17 @@ export default function CertificateCard({ certificate, fraudDetails }: Certifica
 
       {/* Action Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 mt-6 pt-4 border-t border-white/10">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
           <button
-            onClick={() => alert("Downloading PDF Certificate representation...")}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-all"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.print();
+              }
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/15 text-white border border-white/10 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4 text-[#00FF87]" />
-            <span>Download PDF</span>
+            <span>Download PDF / Print</span>
           </button>
           <button
             onClick={() => {

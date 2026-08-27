@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   ShieldCheck, 
@@ -15,12 +15,13 @@ import {
   CheckCircle2, 
   Loader2, 
   KeyRound,
-  UserCheck
+  UserCheck,
+  Sparkles
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import WalletConnectBtn from "@/components/wallet/WalletConnectBtn";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTarget = searchParams.get("redirect") || "/";
@@ -104,6 +105,25 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    try {
+      await apiClient.login("institution@blockcertify.io", "demo123");
+      notifyAuthChanged();
+      setSuccessMsg("Demo Authentication successful! Unlocking all platform pages...");
+      setTimeout(() => {
+        router.push(redirectTarget);
+      }, 600);
+    } catch (err: any) {
+      setErrorMsg("Demo login failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-[85vh] w-full flex items-center justify-center px-4 py-12 bg-radial-gradient">
       {/* Background Decorative Glow Orbs */}
@@ -113,7 +133,7 @@ export default function LoginPage() {
       {/* Main Glassmorphic Auth Container */}
       <div className="w-full max-w-lg glass-panel-neon rounded-3xl p-6 sm:p-10 border border-[#00FF87]/30 shadow-[0_0_50px_rgba(0,255,135,0.15)] bg-[#0B1220]/95 backdrop-blur-2xl relative overflow-hidden">
         {/* Header Branding */}
-        <div className="text-center mb-8 relative">
+        <div className="text-center mb-6 relative">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#00FF87] to-[#00E5FF] p-[1.5px] mx-auto mb-4 shadow-[0_0_25px_rgba(0,255,135,0.35)] transition-transform hover:scale-105">
             <div className="w-full h-full bg-[#070B14] rounded-[14px] flex items-center justify-center">
               <ShieldCheck className="w-8 h-8 text-[#00FF87]" />
@@ -126,6 +146,16 @@ export default function LoginPage() {
           <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
             Sign in or register first to unlock all platform pages & features
           </p>
+
+          {/* Quick 1-Click Demo Login Trigger */}
+          <button
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00FF87]/20 to-[#00E5FF]/20 border border-[#00FF87]/40 text-[#00FF87] hover:text-white hover:border-[#00FF87] text-xs font-mono font-bold transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer shadow-[0_0_15px_rgba(0,255,135,0.15)]"
+          >
+            <Sparkles className="w-3.5 h-3.5 animate-spin" />
+            <span>⚡ One-Click Demo Institution Sign In</span>
+          </button>
         </div>
 
         {/* Tab Switcher */}
@@ -389,5 +419,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[85vh] flex items-center justify-center text-white">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
