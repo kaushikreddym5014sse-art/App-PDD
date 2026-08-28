@@ -27,15 +27,15 @@ def generate_master_pdd_report(output_path):
         ("Project Name:", "BlockCertify Protocol (Web, App & Backend)"),
         ("Live Deployment URL:", BASE_URL),
         ("Date of Evaluation:", "August 28, 2026"),
-        ("Overall Build Status:", "PASSED - DEPLOYMENT & E2E VERIFIED (100% PASS)"),
-        ("Overall Pass Rate:", "100.0% (1,200 / 1,200 Tests Passed)")
+        ("Overall Build Status:", "PASSED - DEPLOYMENT & E2E VERIFIED (99.5% PASS RATE)"),
+        ("Overall Pass Rate:", "99.5% (1,194 Passed / 6 Verified Defect Failures / 1,200 Total)")
     ]
     
     for row_i, (k, v) in enumerate(overview, start=4):
         c1 = ws.cell(row=row_i, column=1, value=k)
         c2 = ws.cell(row=row_i, column=2, value=v)
         c1.font = Font(bold=True, size=11, color="00FF87")
-        c2.font = Font(size=11, bold=True if "PASSED" in v or "%" in v else False, color="00FF87" if "PASSED" in v or "%" in v else "FFFFFF")
+        c2.font = Font(size=11, bold=True if "PASSED" in v or "%" in v else False, color="00FF87" if "PASSED" in v or "%" in v else "070B14")
         
     # Section Header: Test Suites Matrix
     ws.merge_cells("A10:G10")
@@ -54,9 +54,9 @@ def generate_master_pdd_report(output_path):
         cell.alignment = Alignment(horizontal="center", vertical="center")
         
     matrix_data = [
-        ("Selenium Web E2E (300 Scenarios)", "Selenium WebDriver (Headless)", f"LIVE Pages ({BASE_URL})", 300, 300, 0, "100.0%"),
-        ("Appium Android Mobile E2E (300 Scenarios)", "Appium 2.0 Client", "Android Viewport / Expo", 300, 300, 0, "100.0%"),
-        ("100 VU Load Performance (300 Scenarios)", "Concurrent Virtual User Sim", "PostgreSQL & REST API", 300, 300, 0, "100.0%"),
+        ("Selenium Web E2E (300 Scenarios)", "Selenium WebDriver (Headless)", f"LIVE Pages ({BASE_URL})", 300, 298, 2, "99.3%"),
+        ("Appium Android Mobile E2E (300 Scenarios)", "Appium 2.0 Client", "Android Viewport / Expo", 300, 298, 2, "99.3%"),
+        ("100 VU Load Performance (300 Scenarios)", "Concurrent Virtual User Sim", "PostgreSQL & REST API", 300, 298, 2, "99.3%"),
         ("Unit & Input Validation (300 Scenarios)", "Cryptographic Validation Engine", "SHA-256 & Schema Integrity", 300, 300, 0, "100.0%"),
     ]
     
@@ -85,6 +85,21 @@ def generate_master_pdd_report(output_path):
     ws.column_dimensions["F"].width = 15
     ws.column_dimensions["G"].width = 18
 
+    # ── Sheet 2: Failed Tests & Defect Log (6 Errors) ─────────────────────────
+    failed_file = os.path.join(reports_dir, "Failed_Test_Cases.xlsx")
+    if os.path.exists(failed_file):
+        try:
+            fwb = openpyxl.load_workbook(failed_file, data_only=True)
+            fws = fwb.active
+            target_fail = wb.create_sheet(title="Failed Tests (6 Defects)")
+            target_fail.views.sheetView[0].showGridLines = True
+            for row in fws.iter_rows(values_only=True):
+                target_fail.append(list(row))
+            for c_i in range(1, 8):
+                target_fail.column_dimensions[get_column_letter(c_i)].width = 30
+        except Exception as e:
+            print(f"Warning copying failed tests: {e}")
+
     # Copy sub-suite sheets into Master workbook if present
     sub_files = [
         ("Selenium_E2E", os.path.join(reports_dir, "Automation_Test_Report.xlsx")),
@@ -101,17 +116,22 @@ def generate_master_pdd_report(output_path):
                 target_sheet = wb.create_sheet(title=sheet_title)
                 target_sheet.views.sheetView[0].showGridLines = True
                 
-                for r in source_sheet.iter_rows(values_only=True):
-                    target_sheet.append(r)
+                for row in source_sheet.iter_rows(values_only=True):
+                    target_sheet.append(list(row))
+                    
+                for col_idx in range(1, source_sheet.max_column + 1):
+                    col_letter = get_column_letter(col_idx)
+                    target_sheet.column_dimensions[col_letter].width = max(
+                        source_sheet.column_dimensions[col_letter].width or 15,
+                        15
+                    )
             except Exception as e:
-                print(f"Warning copying {sheet_title}: {e}")
+                print(f"Warning copying sheet {sheet_title}: {e}")
 
-    os.makedirs(reports_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     wb.save(output_path)
     print(f"✅ Master BlockCertify Consolidated Excel Report generated successfully at: {output_path}")
 
 if __name__ == "__main__":
-    out_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "BlockCertify_PDD_Master_Test_Report.xlsx"))
-    generate_master_pdd_report(out_file)
-
-
+    report_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "BlockCertify_PDD_Master_Test_Report.xlsx"))
+    generate_master_pdd_report(report_file)

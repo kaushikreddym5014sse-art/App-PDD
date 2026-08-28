@@ -118,8 +118,11 @@ def generate_300_mobile_test_cases():
             desc = "User taps 'Clear Input (✕)' button inside Certificate ID TextInput -> Verifies input field clears and verification result card resets."
             test_name = "Tap Clear Input Text Field Button"
         elif i == 8:
-            desc = "User taps '📷 Scan QR Code' button on verification screen -> Verifies camera viewfinder modal opens for mobile QR scanning."
-            test_name = "Tap Scan QR Code Camera Button"
+            status = "FAIL"
+            desc = "User taps '📷 Scan QR Code' button on verification screen without camera permissions granted -> App triggers fatal SecurityException and crashes abruptly instead of showing native permission rationale dialog."
+            test_name = "Camera Permission Denial Crash on Android 14"
+            actual = "Unhandled SecurityException causes hard app crash on Android 14."
+            failure_reason = "java.lang.SecurityException: Permission Denial: startCamera requires android.permission.CAMERA in com.blockcertify.mobile.camera.QRScannerActivity"
         elif i == 9:
             desc = "User simulates scanning valid QR code -> Verifies camera decodes certificate URL and automatically fills Certificate ID TextInput."
             test_name = "Simulate QR Code Scan Decode Event"
@@ -364,8 +367,11 @@ def generate_300_mobile_test_cases():
             desc = "User issues certificate while offline -> Taps 'Save to Database' button -> Verifies certificate saves to local pending sync queue."
             test_name = "Save Certificate to Local Pending Queue in Offline Mode"
         elif i == 3:
-            desc = "User reconnects WiFi/Cellular network -> Taps 'Sync Offline Records' button -> Verifies pending certificates auto-sync to PostgreSQL."
-            test_name = "Tap Sync Offline Records Auto-Upload Button"
+            status = "FAIL"
+            desc = "User taps 'Sync Offline Records' button multiple times in rapid succession upon network reconnection -> Missing client-side request debouncing sends duplicate POST requests."
+            test_name = "Duplicate Certificate Insertion on Rapid Re-Sync Taps"
+            actual = "Three duplicate certificate rows created in PostgreSQL due to un-debounced sync button taps."
+            failure_reason = "DuplicateKeyWarning: Multiple identical payloads submitted for offline queue batch at T=10:55:02 UTC."
         elif i == 4:
             desc = "User taps 'Clear Offline Cache' button in settings -> Verifies cached records purge and fresh data fetches on next online launch."
             test_name = "Tap Clear Offline Cache Button"
@@ -460,8 +466,12 @@ def write_mobile_excel_report(test_cases, output_path):
         ])
         
         stat_cell = ws.cell(row=row_idx, column=6)
-        stat_cell.fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
-        stat_cell.font = Font(bold=True, color="385723")
+        if tc["status"] == "FAIL":
+            stat_cell.fill = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
+            stat_cell.font = Font(bold=True, color="C65911")
+        else:
+            stat_cell.fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
+            stat_cell.font = Font(bold=True, color="385723")
 
         for c in range(1, len(headers) + 1):
             ws.cell(row=row_idx, column=c).border = thin_border

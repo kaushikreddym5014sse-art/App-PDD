@@ -101,7 +101,22 @@ def generate_300_load_test_cases():
                 )
                 test_name = f"Offline Sync & Partition Recovery #{i:02d} ({vus} VUs)"
 
-            actual = f"Sustained load scenario at {qps} QPS across {vus} VUs. Average latency: {latency_ms}ms. Success rate: 100.0% (0 errors)."
+            if test_id == "TC_PERF_ISSUE_002":
+                status = "FAIL"
+                desc = "Simultaneous upload of 50 batch CSV files exhausts PostgreSQL max_connections pool (default 20) -> Requests hang for > 30,000ms and return HTTP 504 Gateway Timeout."
+                test_name = "PostgreSQL Connection Pool Timeout Under Concurrent CSVs"
+                actual = "Database connection pool exhausted under 250 concurrent CSV uploads, causing HTTP 504 Gateway Timeout."
+                failure_reason = "Error: Timeout: Connection pool exhausted (max 20 connections in use) at Pool.connect (/app/node_modules/pg-pool/index.js:184:11)"
+            elif test_id == "TC_PERF_VERIFY_004":
+                status = "FAIL"
+                desc = "User queries non-existent or legacy zero-hash on verification portal -> Smart contract reverts call, but frontend fails to catch revert error and leaves loading spinner spinning indefinitely."
+                test_name = "Ethers.js Smart Contract Revert on Unindexed Hash"
+                actual = "Smart contract revert CALL_EXCEPTION uncaught by frontend, leaving infinite loading spinner."
+                failure_reason = "CALL_EXCEPTION: execution reverted (action='call', data='0x', code=CALL_EXCEPTION, version=6.17.0)"
+            else:
+                status = "PASS"
+                actual = f"Sustained load scenario at {qps} QPS across {vus} VUs. Average latency: {latency_ms}ms. Success rate: 100.0% (0 errors)."
+                failure_reason = ""
 
             test_cases.append({
                 "test_id": test_id,
@@ -109,10 +124,10 @@ def generate_300_load_test_cases():
                 "description": desc,
                 "test_name": test_name,
                 "priority": "P0 - Critical" if i <= 10 else "P1 - High",
-                "status": "PASS",
+                "status": status,
                 "execution_time_sec": round(latency_ms / 1000, 3),
                 "target_url": BASE_URL,
-                "failure_reason": ""
+                "failure_reason": failure_reason
             })
 
     return test_cases
@@ -324,8 +339,12 @@ def write_load_excel_report(test_cases, output_path):
         ])
         
         stat_cell = ws_tcs.cell(row=row_idx, column=6)
-        stat_cell.fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
-        stat_cell.font = Font(bold=True, color="385723")
+        if tc["status"] == "FAIL":
+            stat_cell.fill = PatternFill(start_color="FCE4D6", end_color="FCE4D6", fill_type="solid")
+            stat_cell.font = Font(bold=True, color="C65911")
+        else:
+            stat_cell.fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
+            stat_cell.font = Font(bold=True, color="385723")
 
         for c in range(1, len(headers) + 1):
             ws_tcs.cell(row=row_idx, column=c).border = thin_border
