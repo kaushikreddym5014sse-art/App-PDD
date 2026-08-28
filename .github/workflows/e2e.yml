@@ -121,12 +121,10 @@ jobs:
           python3 unit_testing/generate_300_unit_tests.py
           python3 reports/generate_master_report.py
           python3 reports/generate_html_dashboard.py
-      - name: Configure Git
+      - name: Deploy to GitHub Pages
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      - name: Deploy to GitHub Pages
-        run: |
           npx -y gh-pages -d out -b gh-pages -t -m "deploy: update GitHub Pages live static site"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

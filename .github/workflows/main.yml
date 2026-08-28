@@ -123,6 +123,8 @@ jobs:
           python3 reports/generate_html_dashboard.py
       - name: Deploy to GitHub Pages
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           npx -y gh-pages -d out -b gh-pages -t -m "deploy: update GitHub Pages live static site"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
