@@ -27,7 +27,7 @@ def generate_300_mobile_test_cases():
             test_id = f"TC-MOB-{counter:03d}"
             counter += 1
             exec_time = round(random.uniform(0.25, 1.45), 2)
-            status = "Pass" if (counter % 45 != 0) else "Fail"
+            status = "PASS" if (counter % 45 != 0) else "FAIL"
 
             desc = f"Verify that mobile user can perform {module_name.lower()} action #{i} on Android viewport layout of {BASE_URL} and receive responsive UI feedback."
             test_name = f"Mobile Test Scenario #{i:02d} — {module_name}"
@@ -92,7 +92,7 @@ def write_mobile_excel_report(test_cases, output_path):
         ])
         
         stat_cell = ws.cell(row=row_idx, column=6)
-        if tc["status"] == "Pass":
+        if tc["status"] == "PASS":
             stat_cell.fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
             stat_cell.font = Font(bold=True, color="385723")
         else:
