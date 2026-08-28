@@ -7,6 +7,11 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 env:
   BASE_URL: https://kaushikreddym5014sse-art.github.io/App-PDD/
 
@@ -122,12 +127,13 @@ jobs:
           python3 reports/generate_master_report.py
           python3 reports/generate_html_dashboard.py
       - name: Deploy to GitHub Pages
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          npx -y gh-pages -d out -b gh-pages -t -m "deploy: update GitHub Pages live static site"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          keep_files: false
+          allow_empty_commit: true
       - uses: actions/upload-artifact@v4
         with:
           name: BlockCertify-Master-Test-Reports
