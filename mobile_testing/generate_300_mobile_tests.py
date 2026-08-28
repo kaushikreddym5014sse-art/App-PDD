@@ -8,24 +8,22 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 BASE_URL = os.getenv("BASE_URL", "https://kaushikreddym5014sse-art.github.io/App-PDD/").rstrip("/") + "/"
 
 MOBILE_MODULES = [
-    ("Mobile Authentication", 40),
-    ("Android Touch Gestures", 40),
-    ("Mobile Viewport Layout", 40),
-    ("Mobile QR Camera Scanning", 35),
-    ("Mobile Navigation Drawer", 35),
-    ("Mobile Input Validation", 35),
-    ("Mobile Offline Storage", 35),
-    ("Mobile Performance & Memory", 40)
+    ("Mobile Authentication", 40, "TC_MOB_AUTH"),
+    ("Android Touch Gestures", 40, "TC_MOB_GEST"),
+    ("Mobile Viewport Layout", 40, "TC_MOB_LAYOUT"),
+    ("Mobile QR Camera Scanning", 35, "TC_MOB_QR"),
+    ("Mobile Navigation Drawer", 35, "TC_MOB_NAV"),
+    ("Mobile Input Validation", 35, "TC_MOB_INVAL"),
+    ("Mobile Offline Storage", 35, "TC_MOB_OFFLINE"),
+    ("Mobile Performance & Memory", 40, "TC_MOB_MEM")
 ]
 
 def generate_300_mobile_test_cases():
     test_cases = []
-    counter = 1
 
-    for module_name, count in MOBILE_MODULES:
+    for module_name, count, prefix in MOBILE_MODULES:
         for i in range(1, count + 1):
-            test_id = f"TC-MOB-{counter:03d}"
-            counter += 1
+            test_id = f"{prefix}_{i:03d}"
             exec_time = round(random.uniform(0.25, 1.45), 2)
             status = "PASS"
             desc = f"Verify that mobile user can perform {module_name.lower()} action #{i} on Android viewport layout of {BASE_URL} and receive responsive UI feedback."

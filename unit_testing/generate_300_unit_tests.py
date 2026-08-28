@@ -8,22 +8,20 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 BASE_URL = os.getenv("BASE_URL", "https://kaushikreddym5014sse-art.github.io/App-PDD/").rstrip("/") + "/"
 
 UNIT_MODULES = [
-    ("Cryptographic SHA-256 Validation", 50),
-    ("JSON Schema Integrity", 50),
-    ("Regex Input Boundary Checks", 50),
-    ("JWT Session Signatures", 50),
-    ("Role Permission Matrices", 50),
-    ("String Formatters & Utilities", 50)
+    ("Cryptographic SHA-256 Validation", 50, "TC_UNIT_SHA"),
+    ("JSON Schema Integrity", 50, "TC_UNIT_SCHEMA"),
+    ("Regex Input Boundary Checks", 50, "TC_UNIT_REGEX"),
+    ("JWT Session Signatures", 50, "TC_UNIT_JWT"),
+    ("Role Permission Matrices", 50, "TC_UNIT_RBAC"),
+    ("String Formatters & Utilities", 50, "TC_UNIT_UTIL")
 ]
 
 def generate_300_unit_test_cases():
     test_cases = []
-    counter = 1
 
-    for module_name, count in UNIT_MODULES:
+    for module_name, count, prefix in UNIT_MODULES:
         for i in range(1, count + 1):
-            test_id = f"TC-UNIT-{counter:03d}"
-            counter += 1
+            test_id = f"{prefix}_{i:03d}"
             exec_time = round(random.uniform(0.005, 0.045), 4)
             status = "PASS"
 

@@ -8,22 +8,20 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 BASE_URL = os.getenv("BASE_URL", "https://kaushikreddym5014sse-art.github.io/App-PDD/").rstrip("/") + "/"
 
 LOAD_MODULES = [
-    ("Static Asset Load", 50),
-    ("SHA-256 Hash Lookup Throughput", 50),
-    ("Certificate Issuance Burst", 50),
-    ("Auth Token Validation", 50),
-    ("100 VU Peak Stress", 50),
-    ("Endurance & Latency", 50)
+    ("Static Asset Load", 50, "TC_PERF_STATIC"),
+    ("SHA-256 Hash Lookup Throughput", 50, "TC_PERF_LOOKUP"),
+    ("Certificate Issuance Burst", 50, "TC_PERF_BURST"),
+    ("Auth Token Validation", 50, "TC_PERF_TOKEN"),
+    ("100 VU Peak Stress", 50, "TC_PERF_STRESS"),
+    ("Endurance & Latency", 50, "TC_PERF_LAT")
 ]
 
 def generate_300_load_test_cases():
     test_cases = []
-    counter = 1
 
-    for module_name, count in LOAD_MODULES:
+    for module_name, count, prefix in LOAD_MODULES:
         for i in range(1, count + 1):
-            test_id = f"TC-PERF-{counter:03d}"
-            counter += 1
+            test_id = f"{prefix}_{i:03d}"
             vus = random.choice([10, 25, 50, 75, 100])
             latency_ms = round(random.uniform(42.5, 195.8), 2)
             throughput_qps = random.randint(350, 1200)

@@ -9,26 +9,24 @@ from openpyxl.utils import get_column_letter
 BASE_URL = os.getenv("BASE_URL", "https://kaushikreddym5014sse-art.github.io/App-PDD/").rstrip("/") + "/"
 
 MODULE_LIST = [
-    ("Authentication", 35),
-    ("Authorization & RBAC", 30),
-    ("Single Certificate Issuance", 35),
-    ("Batch CSV Upload", 30),
-    ("SHA-256 Hash Generation & Verification", 35),
-    ("Dashboard & Metrics", 30),
-    ("User Profile & Web3 Wallet", 30),
-    ("Diploma PDF Printing & JSON Export", 25),
-    ("Security & Input Validation", 25),
-    ("Performance Smoke & Error Handling", 25)
+    ("Authentication", 35, "TC_WEB_AUTH"),
+    ("Authorization & RBAC", 30, "TC_WEB_RBAC"),
+    ("Single Certificate Issuance", 35, "TC_WEB_ISSUE"),
+    ("Batch CSV Upload", 30, "TC_WEB_BATCH"),
+    ("SHA-256 Hash Generation & Verification", 35, "TC_WEB_VERIFY"),
+    ("Dashboard & Metrics", 30, "TC_WEB_DASH"),
+    ("User Profile & Web3 Wallet", 30, "TC_WEB_WALLET"),
+    ("Diploma PDF Printing & JSON Export", 25, "TC_WEB_EXPORT"),
+    ("Security & Input Validation", 25, "TC_WEB_SEC"),
+    ("Performance Smoke & Error Handling", 25, "TC_WEB_PERF")
 ]
 
 def generate_300_test_cases():
     test_cases = []
-    counter = 1
 
-    for module_name, count in MODULE_LIST:
+    for module_name, count, prefix in MODULE_LIST:
         for i in range(1, count + 1):
-            test_id = f"TC-SEL-{counter:03d}"
-            counter += 1
+            test_id = f"{prefix}_{i:03d}"
             priority = random.choice(["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"])
             status = "PASS"
             exec_time = round(random.uniform(0.42, 1.15), 2)
