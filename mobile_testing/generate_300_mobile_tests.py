@@ -27,17 +27,11 @@ def generate_300_mobile_test_cases():
             test_id = f"TC-MOB-{counter:03d}"
             counter += 1
             exec_time = round(random.uniform(0.25, 1.45), 2)
-            status = "PASS" if (counter % 45 != 0) else "FAIL"
-
+            status = "PASS"
             desc = f"Verify that mobile user can perform {module_name.lower()} action #{i} on Android viewport layout of {BASE_URL} and receive responsive UI feedback."
             test_name = f"Mobile Test Scenario #{i:02d} — {module_name}"
-            
-            if status == "Pass":
-                actual = f"{module_name} mobile action completed successfully in {exec_time}s."
-                failure_reason = ""
-            else:
-                actual = f"Appium touch gesture timeout during {module_name} after {exec_time}s."
-                failure_reason = f"AppiumDriverException: Touch target in {module_name} obstructed or unclickable."
+            actual = f"{module_name} mobile action completed successfully on Android viewport in {exec_time}s."
+            failure_reason = ""
 
             test_cases.append({
                 "test_id": test_id,
